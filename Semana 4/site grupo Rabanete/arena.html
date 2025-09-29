@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <title>Arena (Onde Lendas se Encontram)</title>
@@ -81,6 +42,7 @@
     }
     .nav-container {
       margin: 10px 0;
+      text-align: center;
     }
     .nav-button {
       background: linear-gradient(135deg, #8b5a2b 0%, #a06e3c 100%);
@@ -118,31 +80,6 @@
       border-bottom: 2px solid #8b5a2b;
       padding-bottom: 5px;
     }
-    .chaveamento {
-      margin: 20px 0;
-      padding: 15px;
-      background: linear-gradient(135deg, #d4a017 0%, #c28f1e 100%);
-      border: 4px solid #8b5a2b;
-      border-radius: 10px;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    }
-    .chaveamento table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 8px;
-    }
-    .chaveamento th, .chaveamento td {
-      background: linear-gradient(135deg, #e6d5a7 0%, #f0e6d0 100%);
-      padding: 10px;
-      border: 2px solid #8b5a2b;
-      border-radius: 5px;
-      text-align: center;
-      font-size: 1.1em;
-    }
-    .chaveamento th {
-      background: linear-gradient(135deg, #8b5a2b 0%, #6f4a20 100%);
-      color: #fff;
-    }
     .form-group {
       margin: 15px 0;
     }
@@ -166,7 +103,7 @@
       border-color: #d4a017;
       outline: none;
     }
-    .submit-button {
+    .submit-button, #toggle-chaveamento {
       background: linear-gradient(135deg, #8b5a2b 0%, #a06e3c 100%);
       color: white;
       font-weight: bold;
@@ -176,16 +113,61 @@
       cursor: pointer;
       transition: transform 0.2s, background 0.2s;
     }
-    .submit-button:hover {
+    .submit-button:hover, #toggle-chaveamento:hover {
       background: linear-gradient(135deg, #d4a017 0%, #c28f1e 100%);
       transform: scale(1.05);
     }
+    /* Chaveamento-specific styles */
+    .max-w-6xl { max-width: 1280px; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .mt-10 { margin-top: 2.5rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .text-2xl { font-size: 1.5rem; }
+    .font-bold { font-weight: bold; }
+    .text-center { text-align: center; }
+    .flex { display: flex; }
+    .justify-center { justify-content: center; }
+    .items-start { align-items: flex-start; }
+    .gap-8 { gap: 2rem; }
+    .space-y-4 > * + * { margin-top: 1rem; }
+    .space-y-18 > * + * { margin-top: 4.5rem; }
+    .space-y-38 > * + * { margin-top: 9.5rem; }
+    .space-y-76 > * + * { margin-top: 19rem; }
+    .mt-11 { margin-top: 2.75rem; }
+    .mt-25 { margin-top: 6.25rem; }
+    .mt-52 { margin-top: 13rem; }
+    .mt-101 { margin-top: 25.25rem; }
+    .card {
+      background: linear-gradient(135deg, #e6d5a7 0%, #f0e6d0 100%);
+      border: 2px solid #8b5a2b;
+      border-radius: 5px;
+      text-align: center;
+      font-size: 1.1em;
+      padding: 8px;
+    }
+    .card.bg-gray-800 {
+      background: linear-gradient(135deg, #b0a080 0%, #c0b090 100%);
+      color: #666;
+    }
+    .card.bg-gray-900 {
+      background: linear-gradient(135deg, #e6d5a7 0%, #f0e6d0 100%);
+    }
+    .p-2 { padding: 0.5rem; }
+    .rounded-lg { border-radius: 0.5rem; }
+    .border-accent { border: 2px solid #8b5a2b; }
+    .border-muted { border: 2px solid #d4a017; }
+    .accent-2-bg {
+      background: linear-gradient(135deg, #8b5a2b 0%, #6f4a20 100%);
+      color: #fff;
+    }
+    .text-white { color: #fff; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
   <div class="header">
     <div class="logo"></div>
-    <h1>  Arena (Onde Lendas se Encontram)</h1>
+    <h1>Arena (Onde Lendas se Encontram)</h1>
   </div>
 
   <div class="nav-container">
@@ -193,28 +175,113 @@
     <a href="placar.html" class="nav-button">Placar</a>
   </div>
 
-  <div class="section">
-    <h2>Chaves</h2>
-    <div class="chaveamento">
-      <table>
-        <tr>
-          <th>Round 1</th>
-          <th>Round 2</th>
-          <th>Final</th>
-        </tr>
-        <tr>
-          <td>Guerreiro A vs Cavaleiro B</td>
-          <td>Ganhador R1 vs Mago C</td>
-          <td>Ganhador R2</td>
-        </tr>
-        <tr>
-          <td>Arqueiro D vs Bárbaro E</td>
-          <td>Ganhador R1 vs Feiticeira F</td>
-          <td></td>
-        </tr>
-      </table>
-    </div>
+  <div class="text-center">
+    <button id="toggle-chaveamento" class="submit-button">Mostrar Chaveamento</button>
   </div>
+
+  <section id="chaveamento" class="max-w-6xl mx-auto mt-10 hidden">
+    <h2 class="text-2xl font-bold mb-6 text-center">Chaveamento do Torneio - Vencedores</h2>
+    <div class="flex justify-center items-start gap-8">
+      <!-- Coluna de Heróis (24) -->
+      <div class="space-y-4">
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 1</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 2</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 3</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 4</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 5</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 6</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 7</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 8</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 9</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 10</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 11</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 12</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 13</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 14</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 15</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 16</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 17</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 18</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 19</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 20</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 21</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 22</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 23</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Herói 24</div>
+      </div>
+      <!-- Coluna de Vencedores (12) -->
+      <div class="space-y-18 mt-11">
+        <div class="card p-2 rounded-lg text-center border-accent">Vencedor 1</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Vencedor 2</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Vencedor 3</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Vencedor 4</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Vencedor 5</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Vencedor 6</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Vencedor 7</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Vencedor 8</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Vencedor 9</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Vencedor 10</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Vencedor 11</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Vencedor 12</div>
+      </div>
+      <!-- Coluna de Quartas (6) -->
+      <div class="space-y-38 mt-25">
+        <div class="card p-2 rounded-lg text-center border-accent">Quartas 1</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Quartas 2</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Quartas 3</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Quartas 4</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Quartas 5</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Quartas 6</div>
+      </div>
+      <!-- Coluna de Semifinais (3) -->
+      <div class="space-y-76 mt-52">
+        <div class="card p-2 rounded-lg text-center border-accent">Semifinal 1</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Semifinal 2</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Semifinal 3</div>
+      </div>
+      <!-- Campeão -->
+      <div class="mt-101">
+        <div class="accent-2-bg text-white font-bold p-2 rounded-lg text-center border-muted">🏆 Campeão</div>
+      </div>
+    </div>
+    <h2 class="text-2xl font-bold mb-6 mt-10 text-center">Chaveamento do Torneio - Perdedores</h2>
+    <div class="flex justify-center items-start gap-8">
+      <!-- Coluna de Perdedores (12) -->
+      <div class="space-y-18 mt-11">
+        <div class="card p-2 rounded-lg text-center border-accent">Perdedor 1</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Perdedor 2</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Perdedor 3</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Perdedor 4</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Perdedor 5</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Perdedor 6</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Perdedor 7</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Perdedor 8</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Perdedor 9</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Perdedor 10</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Perdedor 11</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Perdedor 12</div>
+      </div>
+      <!-- Coluna de Quartas Perdedores (6) -->
+      <div class="space-y-38 mt-25">
+        <div class="card p-2 rounded-lg text-center border-accent">Quartas Perdedor 1</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Quartas Perdedor 2</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Quartas Perdedor 3</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Quartas Perdedor 4</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Quartas Perdedor 5</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Quartas Perdedor 6</div>
+      </div>
+      <!-- Coluna de Semifinais Perdedores (3) -->
+      <div class="space-y-76 mt-52">
+        <div class="card p-2 rounded-lg text-center border-accent">Semifinal Perdedor 1</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Semifinal Perdedor 2</div>
+        <div class="card p-2 rounded-lg text-center border-accent">Semifinal Perdedor 3</div>
+      </div>
+      <!-- Campeão Perdedor -->
+      <div class="mt-101">
+        <div class="accent-2-bg text-white font-bold p-2 rounded-lg text-center border-muted">🏆 Campeão Perdedor</div>
+      </div>
+    </div>
+  </section>
 
   <div class="section">
     <h2>Visitantes para Batalha</h2>
@@ -223,8 +290,16 @@
 
   <div class="section">
     <h2>Mural de Recados (Comunidade)</h2>
-    <textarea placeholder="Escreva seu recado" rows="4"></textarea>
-    <button class="submit-button" onclick="alert('Recado enviado!')">Enviar</button>
+    <form id="mural-form">
+      <div class="form-group">
+        <input type="text" id="mural-nome" placeholder="Seu nome" required>
+      </div>
+      <div class="form-group">
+        <textarea id="mural-msg" placeholder="Escreva seu recado" rows="4" required></textarea>
+      </div>
+      <button type="submit" class="submit-button">Enviar</button>
+    </form>
+    <div id="mural-mensagens"></div>
   </div>
 
   <div class="section">
@@ -239,45 +314,119 @@
 
   <div class="section">
     <h2>Formulário de Inscrição</h2>
-    <div class="form-group">
-      <label for="warrior-name">Nome do Guerreiro</label>
-      <input type="text" id="warrior-name" placeholder="Ex: Sir Alaric" required>
-    </div>
-    <div class="form-group">
-      <label for="warrior-age">Idade</label>
-      <input type="number" id="warrior-age" placeholder="Ex: 25" required>
-    </div>
-    <div class="form-group">
-      <label for="warrior-weapon">Escolha sua Arma</label>
-      <select id="warrior-weapon">
-        <option value="adaga">Adaga</option>
-        <option value="foice">Foice</option>
-        <option value="espadaFraca">Espada Fraca</option>
-        <option value="vela">Vela</option>
-        <option value="manopla">Manopla</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="warrior-story">Fale sobre sua Jornada</label>
-      <textarea id="warrior-story" placeholder="Conte sua história..." rows="4"></textarea>
-    </div>
-    <button class="submit-button" onclick="submitForm()">Inscreva-se</button>
+    <form id="inscricao-form">
+      <div class="form-group">
+        <label for="inscricao-nome">Nome do Guerreiro</label>
+        <input type="text" id="inscricao-nome" placeholder="Ex: Sir Alaric" required>
+      </div>
+      <button type="submit" class="submit-button">Inscreva-se</button>
+    </form>
+    <p id="aviso" class="hidden" style="color: #d32f2f;">⚠️ O limite de 24 inscrições já foi atingido.</p>
   </div>
 
   <script>
-    function submitForm() {
-      const name = document.getElementById('warrior-name').value;
-      const age = document.getElementById('warrior-age').value;
-      const weapon = document.getElementById('warrior-weapon').value;
-      const story = document.getElementById('warrior-story').value;
+    // Helpers de storage
+    function salvarLocalStorage(chave, dados) {
+      localStorage.setItem(chave, JSON.stringify(dados));
+    }
+    function carregarLocalStorage(chave) {
+      return JSON.parse(localStorage.getItem(chave)) || [];
+    }
 
-      if (!name || !age || !story) {
-        alert('Por favor, preencha todos os campos!');
+    // Inscrições
+    const inscricaoForm = document.getElementById("inscricao-form");
+    const aviso = document.getElementById("aviso");
+    let inscricoes = carregarLocalStorage("inscricoes");
+
+    inscricaoForm.addEventListener("submit", e => {
+      e.preventDefault();
+      if (inscricoes.length >= 24) {
+        aviso.classList.remove("hidden");
         return;
       }
+      const nome = document.getElementById("inscricao-nome").value.trim();
+      inscricoes.push({ nome });
+      salvarLocalStorage("inscricoes", inscricoes);
+      renderChaveamento();
+      inscricaoForm.reset();
+      aviso.classList.add("hidden");
+      document.getElementById("chaveamento").classList.remove("hidden");
+      document.getElementById("toggle-chaveamento").innerText = "Esconder Chaveamento";
+      document.getElementById("chaveamento").scrollIntoView({ behavior: "smooth" });
+    });
 
-      alert(`Inscrição realizada!\nNome: ${name}\nIdade: ${age}\nArma: ${weapon.charAt(0).toUpperCase() + weapon.slice(1)}\nJornada: ${story}`);
+    function renderChaveamento() {
+      // Winners' bracket (first 12 slots for winners, assuming pairs)
+      const winnerSlots = document.querySelectorAll("#chaveamento .space-y-4 > div");
+      winnerSlots.forEach((slot, i) => {
+        if (inscricoes && inscricoes.length > i * 2 && inscricoes[i * 2].nome) {
+          slot.textContent = inscricoes[i * 2].nome; // First player of each pair
+          slot.classList.remove("bg-gray-800", "text-gray-400");
+          slot.classList.add("bg-gray-900");
+        } else {
+          slot.textContent = "Herói " + (i + 1);
+          slot.classList.remove("bg-gray-900");
+          slot.classList.add("bg-gray-800", "text-gray-400");
+        }
+      });
+
+      // Losers' bracket (next 12 slots for losers)
+      const loserSlots = document.querySelectorAll("#chaveamento .space-y-18:nth-of-type(2) > div");
+      loserSlots.forEach((slot, i) => {
+        const loserIndex = i * 2 + 1; // Second player of each pair
+        if (inscricoes && inscricoes.length > loserIndex && inscricoes[loserIndex].nome) {
+          slot.textContent = inscricoes[loserIndex].nome;
+          slot.classList.remove("bg-gray-800", "text-gray-400");
+          slot.classList.add("bg-gray-900");
+        } else {
+          slot.textContent = "Perdedor " + (i + 1);
+          slot.classList.remove("bg-gray-900");
+          slot.classList.add("bg-gray-800", "text-gray-400");
+        }
+      });
     }
+    renderChaveamento();
+
+    // Toggle do chaveamento
+    const toggleBtn = document.getElementById("toggle-chaveamento");
+    const chaveamento = document.getElementById("chaveamento");
+    toggleBtn.addEventListener("click", () => {
+      if (chaveamento.classList.contains("hidden")) {
+        chaveamento.classList.remove("hidden");
+        toggleBtn.innerText = "Esconder Chaveamento";
+        chaveamento.scrollIntoView({ behavior: "smooth" });
+      } else {
+        chaveamento.classList.add("hidden");
+        toggleBtn.innerText = "Mostrar Chaveamento";
+      }
+    });
+
+    // Mural de visitantes
+    const muralForm = document.getElementById("mural-form");
+    const muralMensagens = document.getElementById("mural-mensagens");
+    let mensagens = carregarLocalStorage("mural");
+
+    muralForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const nome = document.getElementById("mural-nome").value.trim();
+      const msg = document.getElementById("mural-msg").value.trim();
+      if (!nome || !msg) return;
+      mensagens.push({ nome, msg });
+      salvarLocalStorage("mural", mensagens);
+      renderMural();
+      muralForm.reset();
+    });
+
+    function renderMural() {
+      muralMensagens.innerHTML = "";
+      mensagens.forEach(m => {
+        const div = document.createElement("div");
+        div.className = "p-4 rounded-lg";
+        div.innerHTML = `<strong>${m.nome}:</strong> <p>${m.msg}</p>`;
+        muralMensagens.appendChild(div);
+      });
+    }
+    renderMural();
   </script>
 </body>
 </html>
